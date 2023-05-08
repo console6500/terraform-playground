@@ -59,4 +59,4 @@ jobs:
         echo '|----------|--------|' >> $GITHUB_STEP_SUMMARY
         terraform show -no-color tfplan | grep -v '::debug::stdout:' | grep 'will be' | awk '{print "|" $2 "|" $5 "|"}' >> $GITHUB_STEP_SUMMARY
         echo -n '# '  >> $GITHUB_STEP_SUMMARY
-        terraform show -no-color tfplan | grep 'Plan:'  >> $GITHUB_STEP_SUMMARY
+        terraform show -no-color tfplan | grep -v '::debug::stdout:' | grep 'Plan:'  >> $GITHUB_STEP_SUMMARY
