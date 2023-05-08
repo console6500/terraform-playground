@@ -15,11 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-    defaults:
-      run:
-        shell: bash
-
     steps:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
