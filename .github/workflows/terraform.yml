@@ -52,6 +52,9 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: |
-        terraform plan -input=false -no-color -out=tfplan \
-          && terraform show -no-color tfplan >> $GITHUB_STEP_SUMMARY
+        terraform plan -input=false -no-color -out=tfplan 
       continue-on-error: true
+
+    - name: Display the Plan
+      run: |
+          terraform show -no-color tfplan | grep -v unchanged | grep -E "(#|Plan:)">> $GITHUB_STEP_SUMMARY
