@@ -44,13 +44,7 @@ jobs:
       id: validate
       run: terraform validate
 
-#    - name: Terraform Plan
-#      id: plan
-#      run: |
-#        terraform plan -input=false -out=tfplan -no-color 
-#      continue-on-error: true
-
-    - name: Plan Terraform
+    - name: Terraform Plan
       id: plan
       continue-on-error: true
       run: |
@@ -58,11 +52,8 @@ jobs:
         && terraform show -no-color tfplan          
 
     - name: Reformat Plan
+      id: reformat
       run: |
         echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
-        | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' >> $GITHUB_STEP_SUMMARY
-          
-#    - name: Display the Plan
-#      run: |
-#          terraform show -no-color tfplan | grep -v unchanged | grep -E "(#|Plan:)">> $GITHUB_STEP_SUMMARY
-
+        | grep -E '(#|Terraform will perform the following actions:|Plan:)' | sed -e 's/\#/-/' >> $GITHUB_STEP_SUMMARY
+    
