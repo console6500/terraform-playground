@@ -53,5 +53,5 @@ jobs:
       id: plan
       run: |
         terraform plan -input=false -no-color -out=tfplan \
-          && terraform show -no-color tfplan
+          && terraform show -no-color tfplan >> $GITHUB_STEP_SUMMARY
       continue-on-error: true
