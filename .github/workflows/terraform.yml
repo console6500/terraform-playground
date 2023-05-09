@@ -80,11 +80,16 @@ jobs:
           
     - name: Checkout
       uses: actions/checkout@v3
-
+      
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.4.6
-        
+
+    - name: Terraform Init
+      id: init
+      run: terraform init
+      
     - name: Terraform fmt
+      id: apply
       run: terraform apply -auto-approve
