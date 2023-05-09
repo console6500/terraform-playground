@@ -63,7 +63,8 @@ jobs:
         } || {
           && echo '# No changes to perform' >> $GITHUB_STEP_SUMMARY \
         }
-          
+    - name: Terraform Validate
+      run: terraform validate          
 
   apply:
     needs: [plan]
