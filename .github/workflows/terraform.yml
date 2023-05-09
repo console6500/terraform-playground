@@ -53,6 +53,7 @@ jobs:
 
     - name: Plan Summary
       id: summary
+      if: ${{ hashFiles('tfplan') != '' }}
       run: |
         echo '# Terraform will perform the following actions' >> $GITHUB_STEP_SUMMARY
         echo '| Action | Resource |' >> $GITHUB_STEP_SUMMARY
@@ -92,11 +93,3 @@ jobs:
 
     - name: Terraform Apply
       run: terraform apply -auto-approve -input=false
-      
-    - run: echo Hello GitHub!
-    - run: echo Hello GitHub!
-    - run: echo Hello GitHub!
-    - run: echo Hello GitHub!
-    - run: echo Hello GitHub!
-    - run: echo Hello GitHub!
-    - run: echo Hello GitHub!
