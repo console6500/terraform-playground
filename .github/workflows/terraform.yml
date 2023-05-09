@@ -65,6 +65,7 @@ jobs:
         terraform show -no-color tfplan | grep -v '::debug::stdout:' | grep 'Plan:'  >> $GITHUB_STEP_SUMMARY
 
   apply:
+    needs: [plan]
     name: Terraform Apply
     runs-on: ubuntu-latest
     environment: apply
@@ -86,5 +87,4 @@ jobs:
         terraform_version: 1.4.6
         
     - name: Terraform fmt
-      id: apply
       run: terraform apply -auto-approve
