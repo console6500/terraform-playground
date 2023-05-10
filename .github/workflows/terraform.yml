@@ -79,7 +79,7 @@ jobs:
               print "Your infrastructure matches the configuration.\n"
               print "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.\n"
               next
-          }' plan.txt >> $GITHUB_STEP_SUMMARY"
+          }' plan.txt >> $GITHUB_STEP_SUMMARY
         
         
         
