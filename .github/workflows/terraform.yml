@@ -139,12 +139,12 @@ jobs:
         id: apply
         run: terraform apply -no-color -auto-approve -input=false | tee apply.txt
 
-      - name: Display the apply summary
+        - name: Display the apply summary
         id: display
         run: |
           {
-            awk '/Apply complete!/ { print "## " $0; next }' plan.txt
-            awk '/compute.amazonaws.com/ {print "- [" $1 "](http://" $3 ")"}' this.txt | sed 's/"//g'
-          } > apply.txt
+            awk '/Apply complete!/ { print "## " $0; next }' apply.txt
+            awk '/compute.amazonaws.com/ {print "- [" $1 "](http://" $3 ")"}' apply.txt | sed 's/"//g'
+          } > apply.md
           
-          cat apply.txt >> $GITHUB_STEP_SUMMARY
+          cat apply.md >> $GITHUB_STEP_SUMMARY
