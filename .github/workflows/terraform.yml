@@ -70,6 +70,7 @@ jobs:
         id: plan
         run: terraform plan -input=false -no-color -out=tfplan
 
+      - run: find . -type f -name tfplan
 
 
   apply:
