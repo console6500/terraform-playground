@@ -41,7 +41,7 @@ jobs:
         then
           echo "# Validation failed.  Check the logs" >> $GITHUB_STEP_SUMMARY
         else
-          echo "# Success! The configuration is valid."
+          echo "# Success! The configuration is valid." >> $GITHUB_STEP_SUMMARY
         fi
 
   plan:
