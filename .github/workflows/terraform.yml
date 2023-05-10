@@ -68,7 +68,7 @@ jobs:
       - name: Terraform Plan
         continue-on-error: true
         id: plan
-        run: terraform plan -input=false -no-color -out=tfplan | tee plan.txt
+        run: terraform plan -input=false -no-color | tee plan.txt
 
   apply:
     needs: [plan]
