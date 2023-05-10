@@ -35,7 +35,14 @@ jobs:
 
     - name: Terraform Validate
       id: validate
-      run: terraform validate
+      run: |
+        terraform validate
+        if [ $? -ne 0 ];
+        then
+          echo "# Validation failed.  Check the logs" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "# Success! The configuration is valid."
+        fi
 
   plan:
     needs: [check]
