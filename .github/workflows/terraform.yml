@@ -33,8 +33,19 @@ jobs:
         
     - name: Terraform fmt
       id: fmt
-      run: terraform fmt -check
       continue-on-error: true
+      run: |
+        format_output=$(terraform fmt -check)
+        if [ $? -ne 0]; 
+        then
+          # Format check failed because there are 
+          echo "# Format check failed on the following files:"
+          for i in ${format_output};
+          do
+            echo "- ${i}"
+          done
+        fi
+
 
     - name: Terraform Init
       id: init
@@ -54,7 +65,8 @@ jobs:
       run: |
         if terraform show -no-color tfplan | grep "No changes. Your infrastructure matches the configuration."; 
         then 
-          echo "# No changes. Your infrastructure matches the configuration." >> $GITHUB_STEP_SUMMARY
+          echo "# No changes."  >> $GITHUB_STEP_SUMMARY
+          echo "Your infrastructure matches the configuration." >> $GITHUB_STEP_SUMMARY
           echo "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed." >> $GITHUB_STEP_SUMMARY
         else 
           echo '# Terraform will perform the following actions:' >> $GITHUB_STEP_SUMMARY
