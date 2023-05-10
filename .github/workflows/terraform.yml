@@ -1,8 +1,7 @@
-name: 'Terraform'
+name: Terraform
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
   workflow_dispatch:
 
@@ -10,63 +9,96 @@ permissions:
   contents: read
 
 jobs:
+  check:
+    name: Check Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+        
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: |
+          terraform validate
+          if [ $? -ne 0 ];
+          then
+            echo "## :bangbang: Validation failed.  Check the logs" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## :white_check_mark: Success! The configuration is valid." >> $GITHUB_STEP_SUMMARY
+          fi
+
   plan:
+    needs: [check]
     name: Terraform Plan
     runs-on: ubuntu-latest
     environment: plan
 
     steps:
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ vars.AWS_REGION }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
           
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Terraform Init
+        id: init
+        run: terraform init
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.4.6
-        
-    - name: Terraform fmt
-      id: fmt
-      run: terraform fmt -check
-      continue-on-error: true
+      - name: Terraform Plan
+        continue-on-error: true
+        id: plan
+        run: |
+          terraform plan -input=false -no-color | tee plan.txt
 
-    - name: Terraform Init
-      id: init
-      run: terraform init
-
-    - name: Terraform Validate
-      id: validate
-      run: terraform validate
-
-    - name: Terraform Plan
-      id: plan
-      continue-on-error: true
-      run: |
-        terraform plan -input=false -no-color -out=tfplan \
-        && terraform show -no-color tfplan          
-
-    - name: Plan Summary
-      id: summary
-      if: ${{ hashFiles('tfplan') != '' }}
-      run: |
-        echo '# Terraform will perform the following actions' >> $GITHUB_STEP_SUMMARY
-        echo '| Action | Resource |' >> $GITHUB_STEP_SUMMARY
-        echo '|----------|---------|' >> $GITHUB_STEP_SUMMARY
-        terraform show -no-color tfplan \
-          | grep -v '::debug::stdout:' \
-          | grep 'will be' | awk '{print "|" $5 "|" $2 "|"}' \
-          | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/' >> $GITHUB_STEP_SUMMARY
-        echo -n '# '  >> $GITHUB_STEP_SUMMARY
-        terraform show -no-color tfplan | grep -v '::debug::stdout:' | grep 'Plan:'  >> $GITHUB_STEP_SUMMARY
+      - name: Display the plan summary
+        id: display
+        run: |
+          {
+            awk '/No changes. Your infrastructure matches the configuration./ {
+              print "## " $0
+              print "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed."
+              exit
+            }' plan.txt
+          
+            awk '/Terraform will perform the following actions:/ {
+              print "## Terraform will perform the following actions:"
+              print "|Action|Resource|"
+              print "|------|--------|"
+              exit
+            }' plan.txt
+          
+            awk '/will be/ {print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0 }' plan.txt \
+              | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
+          } >> $GITHUB_STEP_SUMMARY
 
   apply:
     needs: [plan]
+    if: github.ref == 'refs/heads/main' && github.event.pull_request.merged
     name: Terraform Apply
     runs-on: ubuntu-latest
     environment: apply
