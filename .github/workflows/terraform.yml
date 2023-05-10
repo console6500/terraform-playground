@@ -39,10 +39,10 @@ jobs:
         if [ $? -ne 0]; 
         then
           # Format check failed because there are 
-          echo "# Format check failed on the following files:"
+          echo "# Format check failed on the following files:" >> $GITHUB_STEP_SUMMARY
           for i in ${format_output};
           do
-            echo "- ${i}"
+            echo "- ${i}" >> $GITHUB_STEP_SUMMARY
           done
         fi
 
