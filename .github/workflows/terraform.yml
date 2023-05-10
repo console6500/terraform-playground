@@ -132,8 +132,8 @@ jobs:
         id: display
         run: |
           {
-            awk '/Apply complete!/ { print "## " $0; next }' apply.txt
-            awk '/compute.amazonaws.com/ {print "- [" $1 "](http://" $3 ")"}' apply.txt | sed 's/"//g'
+            awk '/::debug::stdout:/{ next } /Apply complete!/ { print "## " $0; exit }' apply.txt
+            awk '/::debug::stdout:/{ next } /compute.amazonaws.com/ {print "- [" $1 "](http://" $3 ")"}' apply.txt | sed 's/"//g'
           } > apply.md
           
           cat apply.md >> $GITHUB_STEP_SUMMARY
