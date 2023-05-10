@@ -31,7 +31,6 @@ resource "aws_instance" "ec2" {
   for_each                    = local.host
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
-#  iam_instance_profile        = aws_iam_instance_profile.iam.name
   user_data                   = local.user_data
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   associate_public_ip_address = true

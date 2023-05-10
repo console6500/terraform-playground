@@ -47,7 +47,6 @@ jobs:
     needs: [check]
     name: Terraform Plan
     runs-on: ubuntu-latest
-    environment: Production
 
     steps:
       - name: Configure AWS Credentials
@@ -73,11 +72,14 @@ jobs:
         continue-on-error: true
         id: plan
         run: |
-          terraform plan -input=false -no-color | tee plan.txt
+          terraform plan -input=false -no-color -out=tfplan
+          terraform show -no-color tfplan > plan.txt
 
+      - run: cat plan.txt          
       - name: Display the plan summary
         id: display
         run: |
+          cat plan.txt
           {
             awk '/No changes. Your infrastructure matches the configuration./ {
               print "## " $0
@@ -92,7 +94,7 @@ jobs:
               exit
             }' plan.txt
           
-            awk '/will be/ {print "|" $5 "|" $2 "|"; next} /Apply complete!/{ print "## " $0; next }' plan.txt \
+            awk '/Terraform used the selected/{ next } /will be/{print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0; next }' plan.txt \
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
           } >> $GITHUB_STEP_SUMMARY
 
@@ -124,25 +126,9 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false | tee plan.txt
+        run: terraform apply -auto-approve -input=false | tee apply.txt
 
       - name: Display the plan summary
         id: display
         run: |
-          {
-            awk '/No changes. Your infrastructure matches the configuration./ {
-              print "## " $0
-              print "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed."
-              exit
-            }' plan.txt
-          
-            awk '/Terraform will perform the following actions:/ {
-              print "## Terraform will perform the following actions:"
-              print "|Action|Resource|"
-              print "|------|--------|"
-              exit
-            }' plan.txt
-          
-            awk '/will be/ {print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0; next } /Apply complete!/{ print "## " $0; next }' plan.txt \
-              | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
-          } >> $GITHUB_STEP_SUMMARY
+          cat apply.txt
