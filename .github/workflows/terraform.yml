@@ -106,6 +106,7 @@ jobs:
         id: comment
         uses: peter-evans/create-or-update-comment@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.number }}
           body: "${{ env.MARKDOWN_PLAN }}"
           
