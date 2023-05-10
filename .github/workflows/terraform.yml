@@ -96,6 +96,8 @@ jobs:
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
           } > plan.md
           cat plan.md >> $GITHUB_STEP_SUMMARY
+
+
       # If you're up for a challenge, take a look at the following code!
       # I'm trying to get the workflow to update the comments in the PR
       # I've gotten it to work a couple times, but not consistently.
