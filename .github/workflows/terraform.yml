@@ -97,7 +97,16 @@ jobs:
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
           } > plan.md
           cat plan.md >> $GITHUB_STEP_SUMMARY
-          
+
+      - name: Update PR comments
+        if: github.event_name == 'pull_request'
+        id: comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          body-path: plan.md
+
   apply:
     needs: [plan]
     if: github.ref == 'refs/heads/main'
