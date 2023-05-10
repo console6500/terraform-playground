@@ -73,16 +73,26 @@ jobs:
       - name: Display the plan summary
         id: display
         run: |
-          awk '/No changes. Your infrastructure matches the configuration./' plan.txt
-
-          if [ $? -ne 0 ]; 
-          then
-            echo "# hi" >> $GITHUB_STEP_SUMMARY
-          else 
-            echo "# No changes."  >> $GITHUB_STEP_SUMMARY
-            echo "Your infrastructure matches the configuration." >> $GITHUB_STEP_SUMMARY
-            echo "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed." >> $GITHUB_STEP_SUMMARY
-          fi
+          output=$(awk '
+          /No changes. Your infrastructure matches the configuration./ {
+            print "# Terraform will perform the following actions:"
+            print "| Action | Resource |"
+            print "|----------|---------|"
+            cmd = "awk \x27!/::debug::stdout:/ && /will be/ {print \"|\" $5 \"|\" $2 \"|\"} \x27 plan.txt | sed -e \x27s/created/:white_check_mark: create/\x27 -e \x27s/destroyed/:bangbang: destroy/\x27 -e \x27s/replaced/:recycle: replace/\x27"
+            cmd | getline res
+            close(cmd)
+            print res
+            next
+          }
+          {
+            no_changes_msg = "# No changes.\nYour infrastructure matches the configuration.\nTerraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed."
+            print no_changes_msg
+            next
+          }' plan.txt)
+          
+          echo "$output" >> $GITHUB_STEP_SUMMARY
+        
+        
 
   apply:
     needs: [plan]
