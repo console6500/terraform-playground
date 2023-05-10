@@ -1,3 +1,10 @@
+
+variable "server_count" {
+  type        = number
+  default     = 3
+  description = "The total number of VMs to create"
+}
+
 variable "name" {
   type        = string
   description = "The name to assign to resources in this module"
@@ -29,12 +36,6 @@ variable "root_volume_size" {
 variable "production" {
   type    = bool
   default = false
-}
-
-variable "server_count" {
-  type        = number
-  default     = 1
-  description = "The total number of VMs to create"
 }
 
 locals {
