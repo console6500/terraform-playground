@@ -139,7 +139,7 @@ jobs:
         id: apply
         run: terraform apply -no-color -auto-approve -input=false | tee apply.txt
 
-        - name: Display the apply summary
+      - name: Display the apply summary
         id: display
         run: |
           {
