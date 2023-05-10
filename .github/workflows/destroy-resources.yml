@@ -41,9 +41,9 @@ jobs:
         id: display
         run: |
           {
-            awk '/No changes. Your infrastructure matches the configuration./ {
+            awk '/No changes. No objects need to be destroyed./ {
               print "## " $0
-              print "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed."
+              print "Either you have not created any objects yet or the existing objects were already deleted outside of Terraform."
               exit
             }' plan.txt
           
