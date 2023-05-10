@@ -71,7 +71,6 @@ jobs:
         run: terraform plan -input=false -no-color | tee plan.txt
 
       - name: Display the plan summary
-        continue-on-error: true
         id: display
         run: |
           grep "No changes. Your infrastructure matches the configuration." plan.txt
