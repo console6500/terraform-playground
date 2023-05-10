@@ -46,25 +46,27 @@ jobs:
 
     - name: Terraform Plan
       id: plan
-      continue-on-error: true
       run: |
-        terraform plan -input=false -no-color -out=tfplan \
-        && { 
+        terraform plan -input=false -no-color -out=tfplan
+
+    - name: Display the plan summary
+      id: display
+      run: |
+        if terraform show -no-color tfplan | grep "No changes. Your infrastructure matches the configuration."; 
+        then 
+          echo "# No changes. Your infrastructure matches the configuration."
+          echo "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed."
+        else 
+          echo '# Terraform will perform the following actions:' >> $GITHUB_STEP_SUMMARY
+          echo '| Action | Resource |' >> $GITHUB_STEP_SUMMARY
+          echo '|----------|---------|' >> $GITHUB_STEP_SUMMARY
           terraform show -no-color tfplan \
-          && echo '# Terraform will perform the following actions' >> $GITHUB_STEP_SUMMARY \
-          && echo '| Action | Resource |' >> $GITHUB_STEP_SUMMARY \
-          && echo '|----------|---------|' >> $GITHUB_STEP_SUMMARY \
-          && terraform show -no-color tfplan \
             | grep -v '::debug::stdout:' \
             | grep 'will be' | awk '{print "|" $5 "|" $2 "|"}' \
             | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/' >> $GITHUB_STEP_SUMMARY \
-          && echo -n '# '  >> $GITHUB_STEP_SUMMARY \
-          && terraform show -no-color tfplan | grep -v '::debug::stdout:' | grep 'Plan:'  >> $GITHUB_STEP_SUMMARY
-        } || {
-          && echo '# No changes to perform' >> $GITHUB_STEP_SUMMARY \
-        }
-    - name: Terraform Validate
-      run: terraform validate          
+          && echo -n '# '  >> $GITHUB_STEP_SUMMARY
+          terraform show -no-color tfplan | grep -v '::debug::stdout:' | grep 'Plan:'  >> $GITHUB_STEP_SUMMARY
+        fi
 
   apply:
     needs: [plan]
