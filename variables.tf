@@ -1,7 +1,7 @@
 
 variable "server_count" {
   type        = number
-  default     = 0
+  default     = 2
   description = "The total number of VMs to create"
 }
 
@@ -14,7 +14,7 @@ variable "name" {
 variable "environment" {
   type        = string
   description = "The environment to assign to resource in this module"
-  default     = "development"
+  default     = "production"
 }
 
 variable "tags" {
