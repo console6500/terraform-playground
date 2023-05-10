@@ -1,4 +1,4 @@
-name: Destroy Resources
+name: 99-Destroy Resources
 
 on:
   workflow_dispatch:

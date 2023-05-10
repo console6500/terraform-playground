@@ -1,4 +1,4 @@
-name: Terraform
+name: 0-Terraform Pipeline
 
 on:
   push:
