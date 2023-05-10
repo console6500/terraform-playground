@@ -48,6 +48,7 @@ jobs:
     needs: [check]
     name: Terraform Plan
     runs-on: ubuntu-latest
+    concurrency: Production
 
     steps:
       - name: Configure AWS Credentials
@@ -103,6 +104,7 @@ jobs:
     name: Terraform Apply
     runs-on: ubuntu-latest
     environment: Production
+    concurrency: Production
 
     steps:
       - name: Configure AWS Credentials
