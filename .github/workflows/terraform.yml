@@ -68,18 +68,14 @@ jobs:
       - name: Terraform Plan
         continue-on-error: true
         id: plan
-        run: terraform plan -input=false -no-color | tee plan.txt
+        run: |
+          terraform plan -input=false -no-color | tee plan.txt
+          cat plan.txt
 
       - name: Display the plan summary
         id: display
-        run: |
-          awk '
-            /No changes. Your infrastructure matches the configuration./ {
-              print "# No changes.\n"
-              print "Your infrastructure matches the configuration.\n"
-              print "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.\n"
-              next
-          }' plan.txt >> $GITHUB_STEP_SUMMARY
+        run: cat plan.txt
+
         
         
         
