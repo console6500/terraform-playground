@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   check:
@@ -75,11 +77,9 @@ jobs:
           terraform plan -input=false -no-color -out=tfplan
           terraform show -no-color tfplan > plan.txt
 
-      - run: cat plan.txt          
       - name: Display the plan summary
         id: display
         run: |
-          cat plan.txt
           {
             awk '/No changes. Your infrastructure matches the configuration./ {
               print "## " $0
@@ -96,8 +96,18 @@ jobs:
           
             awk '/Terraform used the selected/{ next } /will be/{print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0; next }' plan.txt \
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
-          } >> $GITHUB_STEP_SUMMARY
+          } > plan.md
+          cat plan.md >> $GITHUB_STEP_SUMMARY
 
+      - name: Update PR comments
+        if: github.event_name == 'pull_request'
+        id: comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          body-path: plan.md
+          
   apply:
     needs: [plan]
     if: github.ref == 'refs/heads/main'
@@ -126,9 +136,15 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false | tee apply.txt
+        id: apply
+        run: terraform apply -no-color -auto-approve -input=false | tee apply.txt
 
-      - name: Display the plan summary
+      - name: Display the apply summary
         id: display
         run: |
-          cat apply.txt
+          {
+            awk '/Apply complete!/ { print "## " $0; next }' plan.txt
+            awk '/compute.amazonaws.com/ {print "- [" $1 "](http://" $3 ")"}' this.txt | sed 's/"//g'
+          } > apply.txt
+          
+          cat apply.txt >> $GITHUB_STEP_SUMMARY
