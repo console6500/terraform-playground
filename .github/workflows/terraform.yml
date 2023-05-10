@@ -73,7 +73,7 @@ jobs:
         id: plan
         run: |
           terraform plan -input=false -no-color -out=tfplan
-          terrafrom show tfplan > plan.txt
+          terraform show tfplan > plan.txt
 
       - name: Display the plan summary
         id: display
