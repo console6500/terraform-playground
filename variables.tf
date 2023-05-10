@@ -8,7 +8,7 @@ variable "server_count" {
 variable "name" {
   type        = string
   description = "The name to assign to resources in this module"
-  default     = "webserver"
+  default     = "super-duper-webserver"
 }
 
 variable "environment" {
