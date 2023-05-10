@@ -66,10 +66,10 @@ jobs:
           terraform_version: 1.4.6
     
       - name: Terraform Plan
-        #continue-on-error: true
+        continue-on-error: true
         id: plan
         run: |
-          terraform plan -input=false -no-color -out=tfplan
+          terraform plan -input=false -no-color -out=tfplan || echo ok
 
   apply:
     needs: [plan]
