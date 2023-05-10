@@ -75,7 +75,6 @@ jobs:
           terraform plan -input=false -no-color -out=tfplan
           terraform show -no-color tfplan > plan.txt
 
-      - run: cat plan.txt          
       - name: Display the plan summary
         id: display
         run: |
@@ -96,7 +95,18 @@ jobs:
           
             awk '/Terraform used the selected/{ next } /will be/{print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0; next }' plan.txt \
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
-          } >> $GITHUB_STEP_SUMMARY
+          } > plan.md
+          cat plan.md >> $GITHUB_STEP_SUMMARY
+          echo "plan=$(cat plan.md)" >> $GITHUB_OUTPUT
+
+      - name: Update PR comments
+        if: github.event_name == 'pull_request'
+        id: comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.number }}
+          body: ${{ steps.display.outputs.plan }}
+          
 
   apply:
     needs: [plan]
@@ -126,9 +136,15 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false | tee apply.txt
+        id: apply
+        run: terraform apply -no-color -auto-approve -input=false | tee apply.txt
 
-      - name: Display the plan summary
+      - name: Display the apply summary
         id: display
         run: |
-          cat apply.txt
+          {
+            awk '/Apply complete!/ { print "## " $0; next }' plan.txt
+            awk '/compute.amazonaws.com/ {print "- [" $1 "](http://" $3 ")"}' this.txt | sed 's/"//g'
+          } > apply.txt
+          
+          cat apply.txt >> $GITHUB_STEP_SUMMARY
