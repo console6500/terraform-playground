@@ -1,20 +1,20 @@
 
 variable "server_count" {
   type        = number
-  default     = 2
+  default     = 3
   description = "The total number of VMs to create"
 }
 
 variable "name" {
   type        = string
   description = "The name to assign to resources in this module"
-  default     = "super-duper-webserver"
+  default     = "super-webserver"
 }
 
 variable "environment" {
   type        = string
   description = "The environment to assign to resource in this module"
-  default     = "production"
+  default     = "prod"
 }
 
 variable "tags" {
