@@ -39,9 +39,9 @@ jobs:
         terraform validate
         if [ $? -ne 0 ];
         then
-          echo "# Validation failed.  Check the logs" >> $GITHUB_STEP_SUMMARY
+          echo "## :bangbang: Validation failed.  Check the logs" >> $GITHUB_STEP_SUMMARY
         else
-          echo "# Success! The configuration is valid." >> $GITHUB_STEP_SUMMARY
+          echo "## :white_check_mark: Success! The configuration is valid." >> $GITHUB_STEP_SUMMARY
         fi
 
   plan:
