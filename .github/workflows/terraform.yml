@@ -11,9 +11,16 @@ permissions:
 
 jobs:
   check:
-    name: Terraform Check Format and Validate
+    name: Check Configuration
     runs-on: ubuntu-latest
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+        
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -21,21 +28,21 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.6
-          
+            
       - name: Terraform fmt
         id: fmt
         continue-on-error: true
         run: |
-          format_output=$(terraform fmt -check)
-          if [ $? -ne 0]; 
-          then
-            # Format check failed because there are 
-            echo "# Format check failed on the following files:" >> $GITHUB_STEP_SUMMARY
-            for i in ${format_output};
-            do
-              echo "- ${i}" >> $GITHUB_STEP_SUMMARY
-            done
-          fi
+            format_output=$(terraform fmt -check)
+            if [ $? -ne 0]; 
+            then
+              # Format check failed because there are 
+              echo "# Format check failed on the following files:" >> $GITHUB_STEP_SUMMARY
+              for i in ${format_output};
+              do
+                echo "- ${i}" >> $GITHUB_STEP_SUMMARY
+              done
+            fi
 
       - name: Terraform Init
         id: init
