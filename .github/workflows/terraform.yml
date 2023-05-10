@@ -10,7 +10,43 @@ permissions:
   contents: read
 
 jobs:
+  check:
+    name: Terraform Check Format and Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.6
+          
+      - name: Terraform fmt
+        id: fmt
+        continue-on-error: true
+        run: |
+          format_output=$(terraform fmt -check)
+          if [ $? -ne 0]; 
+          then
+            # Format check failed because there are 
+            echo "# Format check failed on the following files:" >> $GITHUB_STEP_SUMMARY
+            for i in ${format_output};
+            do
+              echo "- ${i}" >> $GITHUB_STEP_SUMMARY
+            done
+          fi
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
   plan:
+    needs: [check]
     name: Terraform Plan
     runs-on: ubuntu-latest
     environment: plan
@@ -22,38 +58,11 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ vars.AWS_REGION }}
-          
-    - name: Checkout
-      uses: actions/checkout@v3
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.4.6
-        
-    - name: Terraform fmt
-      id: fmt
-      continue-on-error: true
-      run: |
-        format_output=$(terraform fmt -check)
-        if [ $? -ne 0]; 
-        then
-          # Format check failed because there are 
-          echo "# Format check failed on the following files:" >> $GITHUB_STEP_SUMMARY
-          for i in ${format_output};
-          do
-            echo "- ${i}" >> $GITHUB_STEP_SUMMARY
-          done
-        fi
-
-
-    - name: Terraform Init
-      id: init
-      run: terraform init
-
-    - name: Terraform Validate
-      id: validate
-      run: terraform validate
 
     - name: Terraform Plan
       id: plan
