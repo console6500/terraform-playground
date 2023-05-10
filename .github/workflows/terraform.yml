@@ -65,7 +65,11 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.4.6
-
+    
+    - name: Terraform Plan
+      id: plan
+      run: |
+        terraform plan -input=false -no-color -out=tfplan
 
   apply:
     needs: [plan]
