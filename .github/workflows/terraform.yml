@@ -33,12 +33,12 @@ jobs:
         id: fmt
         continue-on-error: true
         run: |
-            format_output=$(terraform fmt -check)
+            format_check=$(terraform fmt -check)
             if [ $? -ne 0]; 
             then
               # Format check failed because there are 
               echo "# Format check failed on the following files:" >> $GITHUB_STEP_SUMMARY
-              for i in ${format_output};
+              for i in ${format_check};
               do
                 echo "- ${i}" >> $GITHUB_STEP_SUMMARY
               done
