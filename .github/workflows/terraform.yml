@@ -74,18 +74,13 @@ jobs:
         id: display
         run: |
           awk '
-          /No changes. Your infrastructure matches the configuration./ {
-            print "# Terraform will perform the following actions:" >> "'"$GITHUB_STEP_SUMMARY"'"
-            print "| Action | Resource |" >> "'"$GITHUB_STEP_SUMMARY"'"
-            print "|----------|---------|" >> "'"$GITHUB_STEP_SUMMARY"'"
-            system("awk \x27!/::debug::stdout:/ && /will be/ {print \"|\" $5 \"|\" $2 \"|\"} \x27 plan.txt | sed -e \x27s/created/:white_check_mark: create/\x27 -e \x27s/destroyed/:bangbang: destroy/\x27 -e \x27s/replaced/:recycle: replace/\x27 >> "'"$GITHUB_STEP_SUMMARY"'")
-            exit
-          }
-          {
-            no_changes_msg = "# No changes.\nYour infrastructure matches the configuration.\nTerraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed."
-            print no_changes_msg >> "'"$GITHUB_STEP_SUMMARY"'"
-            exit
-          }' plan.txt
+            /No changes. Your infrastructure matches the configuration./ {
+              print "# No changes.\n"
+              print "Your infrastructure matches the configuration.\n"
+              print "Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.\n"
+              next
+          }' plan.txt >> $GITHUB_STEP_SUMMARY"
+        
         
         
         
