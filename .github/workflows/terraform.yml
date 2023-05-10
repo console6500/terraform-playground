@@ -96,10 +96,6 @@ jobs:
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
           } > plan.md
           cat plan.md >> $GITHUB_STEP_SUMMARY
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "MARKDOWN_PLAN<<$EOF" >> $GITHUB_ENV
-          cat plan.md >> $GITHUB_ENV
-          echo "$EOF" >> $GITHUB_ENV
 
       - name: Update PR comments
         if: github.event_name == 'pull_request'
@@ -108,7 +104,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.number }}
-          body: "${{ env.MARKDOWN_PLAN }}"
+          body-path: plan.md
           
   apply:
     needs: [plan]
