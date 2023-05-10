@@ -96,21 +96,6 @@ jobs:
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
           } > plan.md
           cat plan.md >> $GITHUB_STEP_SUMMARY
-
-
-      # If you're up for a challenge, take a look at the following code!
-      # I'm trying to get the workflow to update the comments in the PR
-      # I've gotten it to work a couple times, but not consistently.
-      # Maybe you can figure it out!?  If you do, let me know on LinkedIn! :D
-      # - Michael J.
-      - name: Update PR comments
-        if: github.event_name == 'pull_request'
-        id: comment
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.number }}
-          body-path: plan.md
           
   apply:
     needs: [plan]
