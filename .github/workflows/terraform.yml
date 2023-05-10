@@ -64,7 +64,11 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.6
-    
+          
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
       - name: Terraform Plan
         continue-on-error: true
         id: plan
