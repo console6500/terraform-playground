@@ -70,8 +70,11 @@ jobs:
         id: plan
         run: terraform plan -input=false -no-color -out=tfplan
 
-      - run: find . -type f -name tfplan
-
+      - name: Display the plan summary
+        continue-on-error: true
+        id: display
+        run: |
+          terraform show -no-color tfplan
 
   apply:
     needs: [plan]
