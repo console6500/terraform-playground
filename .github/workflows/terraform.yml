@@ -124,7 +124,7 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false | plan.txt
+        run: terraform apply -auto-approve -input=false | tee plan.txt
 
       - name: Display the plan summary
         id: display
