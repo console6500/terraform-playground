@@ -78,15 +78,7 @@ jobs:
 
           if [ $? -ne 0 ]; 
           then
-            echo '# Terraform will perform the following actions:' >> $GITHUB_STEP_SUMMARY
-            echo '| Action | Resource |' >> $GITHUB_STEP_SUMMARY
-            echo '|----------|---------|' >> $GITHUB_STEP_SUMMARY
-            cat plan.txt \
-              | grep -v '::debug::stdout:' \
-              | grep 'will be' | awk '{print "|" $5 "|" $2 "|"}' \
-              | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/' >> $GITHUB_STEP_SUMMARY \
-            && echo -n '# '  >> $GITHUB_STEP_SUMMARY
-            cat plan.txt | grep 'Plan:'  >> $GITHUB_STEP_SUMMARY
+            echo "# hi" >> $GITHUB_STEP_SUMMARY
           else 
             echo "# No changes."  >> $GITHUB_STEP_SUMMARY
             echo "Your infrastructure matches the configuration." >> $GITHUB_STEP_SUMMARY
