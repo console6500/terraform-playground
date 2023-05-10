@@ -92,7 +92,7 @@ jobs:
               exit
             }' plan.txt
           
-            awk '/will be/ {print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0 }' ${i} \
+            awk '/will be/ {print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0 }' plan.txt \
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
           } >> $GITHUB_STEP_SUMMARY
 
