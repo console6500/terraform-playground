@@ -75,9 +75,11 @@ jobs:
           terraform plan -input=false -no-color -out=tfplan
           terraform show tfplan > plan.txt
 
+      - run: cat plan.txt          
       - name: Display the plan summary
         id: display
         run: |
+          cat plan.txt
           {
             awk '/No changes. Your infrastructure matches the configuration./ {
               print "## " $0
@@ -92,7 +94,7 @@ jobs:
               exit
             }' plan.txt
           
-            awk '/will be/ {print "|" $5 "|" $2 "|"; next} /Apply complete!/{ print "## " $0; next }' plan.txt \
+            awk '/will be/ {print "|" $5 "|" $2 "|"; next} /Plan:/{ print "## " $0; next }' plan.txt \
               | sed -e 's/created/:white_check_mark: create/' -e 's/destroyed/:bangbang: destroy/' -e 's/replaced/:recycle: replace/'
           } >> $GITHUB_STEP_SUMMARY
 
