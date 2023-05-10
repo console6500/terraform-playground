@@ -68,13 +68,9 @@ jobs:
       - name: Terraform Plan
         continue-on-error: true
         id: plan
-        run: terraform plan -input=false -no-color -out=tfplan || echo ok
+        run: terraform plan -input=false -no-color -out=tfplan
 
-      - name: Display the plan summary
-        continue-on-error: true
-        id: display
-        run: |
-          terraform show -no-color tfplan
+
 
   apply:
     needs: [plan]
